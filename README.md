@@ -1,4 +1,4 @@
-# Using Hugging Face skills with Claude Code
+# Using Hugging Face skills with your coding agent
 
 ⚠️ First draft: Loads of generated content. Scripts are tested and working, but the documentation is rough.
 
@@ -8,9 +8,9 @@
 - Week 2 - [Supervised fine-tuning on the Hub](quests/sft-finetune-hub.md)
 - Week 3 - [Publish a Hub dataset](quests/publish-hub-dataset.md)
 
-## What are Claude skills?
+## What are your coding agent skills?
 
-Claude skills are self-contained folders that package instructions, scripts, and resources. Each folder includes a `SKILL.md` file with YAML frontmatter (name and description) followed by the guidance Claude follows while the skill is active. Skills can target creative work, technical automation, or enterprise workflows—this repository focuses on Hugging Face tasks such as data set preparation, evaluation, and model training.
+Your coding agent consumes self-contained folders that package instructions, scripts, and resources. Each folder includes a `SKILL.md` file with YAML frontmatter (name and description) followed by the guidance your coding agent follows while the skill is active. Skills can target creative work, technical automation, or enterprise workflows—this repository focuses on Hugging Face tasks such as data set preparation, evaluation, and model training.
 
 ## Repository layout
 
@@ -30,16 +30,24 @@ Claude skills are self-contained folders that package instructions, scripts, and
 3. Choose the folder you want (`hf-llm-trainer`, `hf_model_evaluation`, `hf_dataset_creator`, or `hf-paper-publisher`) and select **Install now**.
 4. Prefer commands? After registering the marketplace, run `/plugin install <skill-folder>@huggingface-skills` (for example, `/plugin install hf-llm-trainer@huggingface-skills`).
 
+## Use these skills with Codex
+
+Codex looks for long-lived instructions in `AGENTS.md`, so copy or symlink this repository’s `AGENTS.md` into your Codex profile (default `~/.codex/AGENTS.md`) or point `CODEX_HOME=$(pwd)/.codex` at the workspace before launching the CLI to scope the guidance per project. Codex rebuilds its instruction chain every run, so after updating the file you can verify the active guidance with `codex --ask-for-approval never "Summarize the current instructions."` or `codex --cd hf-llm-trainer --ask-for-approval never "Show which instruction files are active."` to confirm the Hugging Face skills are being read. Keep the skill folders accessible from that profile so Codex can reuse the templates, scripts, and references you mention inside the instructions. [Codex AGENTS guide](https://developers.openai.com/codex/guides/agents-md)
+
+## Install the Gemini CLI extension
+
+This repository already includes a `gemini-extension.json`, so you can treat it as a Gemini CLI extension when you prefer the Gemini tooling. Install it locally with `gemini extensions install /Users/ben/code/skills --consent` (or pass the GitHub URL) and restart Gemini CLI; the extension will appear as `huggingface-skills` because the CLI copies each extension into `~/.gemini/extensions`. Refresh it with `gemini extensions update huggingface-skills` when the repo changes, temporarily disable or scope it with `gemini extensions disable|enable huggingface-skills --scope workspace`, and, when you want live edits without reinstalling, run `gemini extensions link /Users/ben/code/skills` so the CLI reads directly from this working tree. [Gemini CLI extensions](https://geminicli.com/docs/extensions/#installing-an-extension)
+
 ## Use an installed skill
 
-Once a skill is installed, mention it directly while giving Claude Code instructions:
+Once a skill is installed, mention it directly while giving your coding agent instructions:
 
 - "Use the HF LLM trainer skill to estimate the GPU memory needed for a 70B model run."
 - "Use the HF model evaluation skill to launch `run_eval_job.py` on the latest checkpoint."
 - "Use the HF dataset creator skill to draft new few-shot classification templates."
 - "Use the HF paper publisher skill to index my arXiv paper and link it to my model."
 
-Claude automatically loads the corresponding `SKILL.md` instructions and helper scripts while it completes the task.
+Your coding agent automatically loads the corresponding `SKILL.md` instructions and helper scripts while it completes the task.
 
 ## Contribute or customize a skill
 
@@ -55,7 +63,7 @@ Claude automatically loads the corresponding `SKILL.md` instructions and helper 
    Guidance + examples + guardrails
    ```
 3. Add or edit supporting scripts, templates, and documents referenced by your instructions.
-4. Reinstall or reload the skill bundle in Claude Code so the updated folder is available.
+4. Reinstall or reload the skill bundle in your coding agent so the updated folder is available.
 
 ## Additional references
 
