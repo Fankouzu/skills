@@ -45,7 +45,7 @@ Here's the schedule:
 
 ### 1. Join the Organization
 
-Join [humanitys-last-hackathon](https://huggingface.co/organizations/humanitys-last-hackathon/share/KrqrmBxkETjvevFbfkXeezcyMbgMjjMaOp) on Hugging Face. This is where your contributions will be tracked and updated on the leaderboard.
+Join [hf-skills](https://huggingface.co/organizations/hf-skills/share/KrqrmBxkETjvevFbfkXeezcyMbgMjjMaOp) on Hugging Face. This is where your contributions will be tracked and updated on the leaderboard.
 
 ### 2. Set Up Your Coding Agent
 

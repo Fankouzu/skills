@@ -3,7 +3,7 @@
 **Goal:** Add evaluation results to model cards across the Hub. Together, we're building a distributed leaderboard of open source model performance.
 
 >[!NOTE]
-> Bonus XP for contributing to the leaderboard application. Open a PR [on the hub](https://huggingface.co/spaces/humanitys-last-hackathon/distributed-leaderboard/discussions) or [on GitHub](https://github.com/huggingface/skills/blob/main/apps/evals-leaderboard/app.py) to get your XP.
+> Bonus XP for contributing to the leaderboard application. Open a PR [on the hub](https://huggingface.co/spaces/hf-skills/distributed-leaderboard/discussions) or [on GitHub](https://github.com/huggingface/skills/blob/main/apps/evals-leaderboard/app.py) to get your XP.
 
 ## Why This Matters
 

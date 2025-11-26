@@ -35,10 +35,10 @@ python hf_dataset_creator/scripts/dataset_manager.py quick_setup \
 
 ```bash
 python hf_dataset_creator/scripts/dataset_manager.py init \
-  --repo_id "humanitys-last-hackathon/your-dataset-name"
+  --repo_id "hf-skills/your-dataset-name"
 
 python hf_dataset_creator/scripts/dataset_manager.py add_rows \
-  --repo_id "humanitys-last-hackathon/your-dataset-name" \
+  --repo_id "hf-skills/your-dataset-name" \
   --template classification \
   --rows_json "$(cat your_data.json)"
 ```
