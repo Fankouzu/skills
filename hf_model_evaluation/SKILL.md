@@ -89,7 +89,7 @@ uv run scripts/evaluation_manager.py inspect-tables --repo-id "username/model"
 uv run scripts/evaluation_manager.py extract-readme \
   --repo-id "username/model" \
   --table 1 \
-  [--model-name-override "<column header/model name>"] \
+  [--model-name-override "<column header/model name>" | --model-column-index <column index>] \
   [--model-column-index <column index shown by inspect-tables>]
 
 # 3) Apply changes (push or PR)
@@ -105,8 +105,8 @@ uv run scripts/evaluation_manager.py extract-readme \
 ```
 
 Validation checklist:
-- By default YAML is printed; compare against the README table before applying.
-- Use `--model-name-override` when your model column/row is not an exact match.
+- YAML is printed by default; compare against the README table before applying.
+- Use `--model-name-override` **or** `--model-column-index` when your model column/row is not an exact match.
 - For transposed tables (models as rows), ensure only one row is extracted.
 
 ### Method 2: Import from Artificial Analysis
@@ -193,8 +193,7 @@ uv run scripts/evaluation_manager.py inspect-tables --repo-id "username/model-na
 uv run scripts/evaluation_manager.py extract-readme \
   --repo-id "username/model-name" \
   --table N \
-  [--model-name-override "Column Header or Model Name"] \
-  [--model-column-index N] \
+  [--model-name-override "Column Header or Model Name" | --model-column-index N] \
   [--task-type "text-generation"] \
   [--dataset-name "Custom Benchmarks"] \
   [--apply | --create-pr]
@@ -272,7 +271,7 @@ WARNING: Do not use markdown formatting in the model name. Use the exact name fr
 
 1. **Always start with `inspect-tables`**: See table structure and get the correct extraction command
 2. **Use `--help` for guidance**: Run `inspect-tables --help` to see the complete workflow
-3. **Use `--dry-run` first**: Preview YAML output before applying changes
+3. **Preview first**: Default behavior prints YAML; review it before using `--apply` or `--create-pr`
 4. **Verify extracted values**: Compare YAML output against the README table manually
 5. **Use `--table N` for multi-table READMEs**: Required when multiple evaluation tables exist
 6. **Use `--model-name-override` for comparison tables**: Copy the exact column header from `inspect-tables` output
