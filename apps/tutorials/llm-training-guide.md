@@ -303,7 +303,7 @@ If something goes wrong, the agent helps diagnose. Out of memory? the agent sugg
 
 ## Converting to GGUF
 
-After training, you might want to run your model locally. The GGUF format works with Ollama, LM Studio, and llama.cpp.
+After training, you might want to run your model locally. The GGUF format works with llama.cpp and dependent tools like LM Studio, Ollama, etc.
 
 ```
 Convert my fine-tuned model to GGUF with Q4_K_M quantization.
@@ -315,7 +315,10 @@ The agent submits a conversion job that merges LoRA adapters, converts to GGUF, 
 Then use it locally:
 
 ```bash
-ollama run hf.co/username/my-model-gguf
+llama-server -hf <username>/<model-name>:<quantization>
+
+# For example, to run the Qwen3-1.7B-GGUF model on your local machine:
+llama-server -hf unsloth/Qwen3-1.7B-GGUF:Q4_K_M
 ```
 
 ## What's Next
