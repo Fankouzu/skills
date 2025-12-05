@@ -183,7 +183,57 @@ After starting training:
 2. The Gradio dashboard shows all tracked experiments
 3. Filter by project, compare runs, view charts with smoothing
 
+## MCP Server for Programmatic Access
+
+Trackio provides an MCP (Model Context Protocol) server that enables Claude to query training metrics programmatically. This allows for intelligent monitoring, loss curve analysis, and automated recommendations.
+
+### Enabling the MCP Server
+
+Start the Trackio dashboard with MCP server enabled:
+
+```bash
+# CLI
+trackio show --mcp-server
+
+# Or via Python
+import trackio
+trackio.show(mcp_server=True)
+
+# Or via environment variable
+export GRADIO_MCP_SERVER=True && trackio show
+```
+
+The server runs at `http://127.0.0.1:7860/gradio_api/mcp/` by default.
+
+### MCP Client Configuration
+
+Add to your Claude MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "trackio": {
+      "url": "http://127.0.0.1:7860/gradio_api/mcp/"
+    }
+  }
+}
+```
+
+### Available MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `get_all_projects` | List all tracked projects |
+| `get_runs_for_project` | List runs within a project |
+| `get_metrics_for_run` | Get available metrics for a run |
+| `get_metric_values` | Fetch metric history (loss curves) |
+| `get_project_summary` | Project overview with run count |
+| `get_run_summary` | Run details with config and metrics |
+
+**See:** `references/trackio_mcp_monitoring.md` for complete MCP monitoring guide including loss curve interpretation and troubleshooting patterns.
+
 ## Recommendation
 
 - **Trackio**: Best for real-time monitoring during long training runs
+- **Trackio MCP**: Best for programmatic monitoring and AI-assisted analysis
 - **Weights & Biases**: Best for team collaboration, requires account

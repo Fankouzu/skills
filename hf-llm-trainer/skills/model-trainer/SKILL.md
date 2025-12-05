@@ -334,6 +334,25 @@ trl-jobs sft \
 
 ⚠️ **In Claude Code context, prefer using `hf_jobs()` MCP tool (Approach 1) when available.**
 
+### Approach 5: Run scripts directly local device
+
+⚠️ **Important:** This approach is only possible on devices with `uv` installed and sufficient GPU memory.
+
+#### Before running the script
+
+- check the script path
+- check uv is installed
+- check gpu is available with `nvidia-smi`
+
+#### Running the script
+
+```bash
+uv run scripts/train_sft_example.py
+```
+
+**Benefits:** No need to use `hf_jobs()` MCP tool, can run scripts directly in terminal
+**When to use:** User working in local device directly  when GPU is available
+
 ## Hardware Selection
 
 | Model Size | Recommended Hardware | Cost (approx/hr) | Use Case |
@@ -457,7 +476,7 @@ These scripts demonstrate proper Hub saving, Trackio integration, checkpoint man
 - **Space ID**: `{username}/trackio` (use "trackio" as default space name)
 - **Run naming**: Unless otherwise specified, name the run in a way the user will recognize (e.g., descriptive of the task, model, or purpose)
 - **Config**: Keep minimal - only include hyperparameters and model/dataset info
-- **Project Name**: Use a Project Name to associate runs with a particular Project 
+- **Project Name**: Use a Project Name to associate runs with a particular Project
 
 **User overrides:** If user requests specific trackio configuration (custom space, run naming, grouping, or additional config), apply their preferences instead of defaults.
 
@@ -465,6 +484,46 @@ These scripts demonstrate proper Hub saving, Trackio integration, checkpoint man
 This is useful for managing multiple jobs with the same configuration or keeping training scripts portable.
 
 See `references/trackio_guide.md` for complete documentation including grouping runs for experiments.
+
+### Trackio MCP Server for AI-Assisted Monitoring
+
+When the Trackio MCP server is configured, Claude can directly query training metrics to provide intelligent analysis:
+
+**Setup:** Start Trackio with MCP enabled:
+```bash
+trackio show --mcp-server
+```
+
+**Available MCP tools:**
+- `get_all_projects` - List tracked projects
+- `get_runs_for_project` - List runs in a project
+- `get_metric_values` - Fetch loss curves and metrics
+- `get_run_summary` - Get run details and config
+
+**What Claude can do with MCP access:**
+- Fetch and analyze loss curves in real-time
+- Detect overfitting (train loss ↓, eval loss ↑)
+- Identify learning rate issues (spikes, plateaus, divergence)
+- Compare runs across experiments
+- Provide actionable recommendations
+
+**Example monitoring workflow:**
+```
+User: "Check on my training run"
+Claude: [Uses get_metric_values to fetch train/loss and eval/loss]
+        [Analyzes patterns and provides status report]
+
+"Training Progress (step 1500/3000):
+- Train loss: 0.82 (down 64% from start)
+- Eval loss: 0.91 (tracking well, no overfitting)
+✅ Healthy training - continue and check at step 2000"
+```
+
+**See:** `references/trackio_mcp_monitoring.md` for complete MCP monitoring guide including:
+- Loss curve interpretation patterns
+- Metric reference for SFT/DPO/GRPO
+- Troubleshooting common training issues
+- Run comparison workflows
 
 ### Check Job Status
 
@@ -669,6 +728,7 @@ Add to PEP 723 header:
 - `references/training_patterns.md` - Common training patterns and examples
 - `references/gguf_conversion.md` - Complete GGUF conversion guide
 - `references/trackio_guide.md` - Trackio monitoring setup
+- `references/trackio_mcp_monitoring.md` - MCP server for AI-assisted monitoring and loss curve interpretation
 - `references/hardware_guide.md` - Hardware specs and selection
 - `references/hub_saving.md` - Hub authentication troubleshooting
 - `references/troubleshooting.md` - Common issues and solutions
