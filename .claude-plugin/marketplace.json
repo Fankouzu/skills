@@ -42,6 +42,11 @@
       "name": "hugging-face-jobs",
       "source": "./skills/hugging-face-jobs",
       "description": "Run compute jobs on Hugging Face infrastructure. Execute Python scripts, manage scheduled jobs, and monitor job status."
+    },
+    {
+      "name": "hugging-face-trackio",
+      "source": "./skills/hugging-face-trackio",
+      "description": "Track and visualize ML training experiments with Trackio. Log metrics via Python API and retrieve them via CLI. Supports real-time dashboards synced to HF Spaces."
     }
   ]
 }
