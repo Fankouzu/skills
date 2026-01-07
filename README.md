@@ -71,10 +71,10 @@ This repository contains a few skills to get you started. You can also contribut
 
 | Skill Folder            | Description                                                                                                                | Documentation                                          |
 |-------------------------|----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|
-| `hf_dataset_creator/`   | Prompts, templates, and scripts for creating structured training datasets. | [SKILL.md](hf_dataset_creator/skills/hugging-face-dataset-creator/SKILL.md) |
-| `hf_model_evaluation/`  | Instructions plus utilities for orchestrating evaluation jobs, generating reports, and mapping metrics. | [SKILL.md](hf_model_evaluation/skills/hugging-face-evaluation-manager/SKILL.md) |
+| `hf-datasets/`   | Prompts, templates, and scripts for creating structured training datasets. | [SKILL.md](hf-datasets/skills/hugging-face-dataset-creator/SKILL.md) |
+| `hf-evaluation/`  | Instructions plus utilities for orchestrating evaluation jobs, generating reports, and mapping metrics. | [SKILL.md](hf-evaluation/skills/hugging-face-evaluation-manager/SKILL.md) |
 | `hf-llm-trainer/`       | Comprehensive training skill with `SKILL.md` guidance, helper scripts (e.g., `train_sft_example.py`, `convert_to_gguf.py`, cost estimators). | [SKILL.md](hf-llm-trainer/skills/model-trainer/SKILL.md) |
-| `hf-paper-publisher/`   | Tools for publishing and managing research papers on Hugging Face Hub. Index papers from arXiv, link papers to models/datasets, generate professional research articles from templates, and manage paper authorship. | [SKILL.md](hf-paper-publisher/skills/hugging-face-paper-publisher/SKILL.md) |
+| `hf-papers/`   | Tools for publishing and managing research papers on Hugging Face Hub. Index papers from arXiv, link papers to models/datasets, generate professional research articles from templates, and manage paper authorship. | [SKILL.md](hf-papers/skills/hugging-face-paper-publisher/SKILL.md) |
 
 ### Using skills in your coding agent
 
@@ -89,7 +89,7 @@ Your coding agent automatically loads the corresponding `SKILL.md` instructions 
 
 ### Contribute or customize a skill
 
-1. Copy one of the existing skill folders (for example, `hf_dataset_creator/`) and rename it.
+1. Copy one of the existing skill folders (for example, `hf-datasets/`) and rename it.
 2. Update the new folder’s `SKILL.md` frontmatter:
    ```markdown
    ---
