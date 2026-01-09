@@ -1,0 +1,3 @@
+- add examples folder with python function example.
+- add content transformation examples (e.g. summary->tweet, code->docs, code->refactor).
+- add JSON history format reference
