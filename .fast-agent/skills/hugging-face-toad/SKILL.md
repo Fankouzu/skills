@@ -33,6 +33,8 @@ AgentCards placed in the `.fast-agent/tool-cards` directory are loaded as Tools 
 
 **CRITICAL** In the `Toad` client environment, the application must be restarted before new or modified Agents are visible to the User. The User can use `ctrl+o` to "change mode" and see the available agents.
 
+**IMPORTANT** File paths are specified relative to the `agent-cards` or `tool-cards` folder. DO NOT place other `.md` markdown files in these folders as they will be mistaken for AgentCards. Instead use well named subdirectories to store companion files.
+
 AgentCards can be hot-loaded as Tools for the current Agent by the User with the `/card <filename.md> --tool` slash command. 
 
 ## AgentCard Format
