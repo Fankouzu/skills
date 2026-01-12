@@ -1,128 +1,108 @@
 ---
 name: hugging-face-toad
-description: Agent Builder to build customised powerful agents to help Users with their tasks. Use to build and configure agents in this environment - for tasks including search, analysis and general tasks. Can be combined with the hugging-face-tool-builder to create powerful HF Specific integrations.
+description: Use when users want to create new agents, configure agent behavior, build sub-agents as tools, or set up few-shot prompting patterns. Combine with hugging-face-tool-builder and huggingface-cli for powerful Hugging Face integrations.
 ---
 
 # Agent Builder
 
-The purpose of this skill is to create one or more AgentCards that will be installed in this environment to help the User achieve their goals.
+Create AgentCards—markdown files with YAML frontmatter—that define agents for this environment.
 
-AgentCards are markdown files with a simple YAML frontmatter that describe Agents. Good agents:
- - Goal focussed - will direct themselves using tools and available information to reach a goal.
- - Simple - but use all available tools and techniques to produce high quality outputs. 
- - Flexible - Able to adapt to unexpected circumstances to achieve the outcome.
+**Good agents are:**
+- **Goal-focused** — Direct themselves toward outcomes, not just execute instructions
+- **Simple** — Minimal complexity; leverage tools over elaborate prompting
+- **Flexible** — Adapt to unexpected circumstances while remaining efficient
+- **Context-efficient** — Return concise, actionable responses; don't bloat parent context with intermediate work
 
-This skill is describes how to:
- - Customising Agents for Users to interact with
- - Creating context-efficient sub-agents (as Tools) for Agents to use when completing higher level tasks.
+AgentCards support preloaded User/Assistant conversations for few-shot prompting or as starting points for future interactions.
 
-AgentCards support preloading of User/Assistant conversation in to the Agents context for in-context learning/few-shot prompting, or providing a starting point for future User/Agent conversation turns.
+**Use cases include:**
+- Creating "experts" with access to URLs or specific filesystem areas
+- Automating tasks and workflows
+- Using few-shot prompting to transform content (documents, prose, code)
 
-Examples include but are not limited to:
- - Creating "experts" that have direct access to information from URLs or specific areas of the filesystem.
- - Building Tools to automate tasks and workflows.
- - Using in-context learning (few shot prompting) to rewrite documents, prose, source code or otherwise transform content. 
+## Installation & Loading
 
-## Loading and Using AgentCards
+| Location | Behavior |
+|----------|----------|
+| `.fast-agent/agent-cards/` | Loaded on startup, accessible to users |
+| `.fast-agent/tool-cards/` | Loaded as tools for the default agent |
 
-### On Startup
+**⚠️ CRITICAL:** In Toad, restart the application after adding/modifying agents. Use `ctrl+o` to view available agents.
 
-AgentCards placed in the `.fast-agent/agent-cards` directory are automatically loaded on startup, and are accessible to the User. This is the simplest approach to install a new AgentCard.
+**⚠️ IMPORTANT:** Paths are relative to the cards folder. Don't place other `.md` files in these directories—use subdirectories for companion files.
 
-AgentCards placed in the `.fast-agent/tool-cards` directory are loaded as Tools for the default agent.
+Hot-load agents as tools: `/card <filename.md> --tool`
 
-**CRITICAL** In the `Toad` client environment, the application must be restarted before new or modified Agents are visible to the User. The User can use `ctrl+o` to "change mode" and see the available agents.
+## Choosing the Right Approach
 
-**IMPORTANT** File paths are specified relative to the `agent-cards` or `tool-cards` folder. DO NOT place other `.md` markdown files in these folders as they will be mistaken for AgentCards. Instead use well named subdirectories to store companion files.
+| Approach | Consumer | Best For |
+|----------|----------|----------|
+| **Agent** | User | Direct interaction, exploration, multi-turn conversation |
+| **Agent-as-Tool** | Agent | Encapsulated multi-step reasoning where only results matter |
+| **Shell** | Agent | Leveraging existing CLI tools, piping, simple commands |
+| **Python Function** | Agent | Data transformation, structured I/O, complex processing, API calls |
 
-AgentCards can be hot-loaded as Tools for the current Agent by the User with the `/card <filename.md> --tool` slash command. 
+**Decision flow:**
+1. Does the user need to interact directly? → **Agent**
+2. Does it require LLM reasoning across steps? → **Agent-as-Tool**
+3. Does an existing CLI tool do this? → **Shell**
+4. Otherwise → **Python Function**
 
 ## AgentCard Format
 
 ### Frontmatter
 
-A typical frontmatter looks like this:
-
 ```yaml
 ---
-name: agent_name # name for the agent - if not supplied the filename is used (preferred).
-description: # optional, description used if this AgentCard is used as a tool
-agents: # optional, list of agents  
+name: agent_name        # defaults to filename (preferred)
+description: string     # used when exposed as a tool
+agents: [list]          # child agents available as tools
 ---
 ```
 
-Here is a short reference of the main configuration options. Don't specify a value if the default is preferred.
-
-#### Core Fields
+#### Configuration Reference
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `name` | string | filename | AgentCard identifier. Defaults to the filename (without extension) if omitted (preferred). |
-| `description` | string | - | Description used when the AgentCard is exposed as a tool. |
-| `default` | boolean | false | Marks this agent as the default when multiple agents are loaded. |
-| `model` | string | config default | Model selector - prefer default unless User specifies preference |
+| `name` | string | filename | AgentCard identifier |
+| `description` | string | — | Tool description when used as sub-agent |
+| `default` | boolean | false | Mark as default when multiple agents loaded |
+| `model` | string | config | Model selector—use default unless specified |
+| `use_history` | boolean | true | Retain conversation history; `false` for stateless agents |
+| `shell` | boolean | false | Enable `execute` tool for shell commands |
+| `cwd` | string | — | Working directory for shell (requires `shell: true`) |
+| `skills` | list/string | auto | Skills directory or `[]` to disable |
+| `agents` | list | [] | Child agents as tools |
+| `messages` | string/list | — | Path(s) to history files (relative to agent-cards) |
+| `function_tools` | list | [] | Python functions: `["module.py:function_name"]` |
+| `request_params` | dict | {} | Model params (e.g., `{temperature: 0.7}`)—use defaults unless requested |
+| `tool_only` | boolean | false | Hide from agent list; available only as a tool for other agents |
 
+### Body (System Prompt)
 
-#### Behavior
+The markdown body after frontmatter defines the system prompt. If omitted, the default is used.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `use_history` | boolean | true | Retain conversation history between turns. Set to `false` for stateless "responder" agents. |
-| `shell` | boolean | false | Enable shell command execution via `execute` tool. |
-| `cwd` | string | - | Working directory for shell commands (requires `shell: true`). |
-| `skills` | list/string | auto | Skills directory or `[]` to disable skill discovery. (See note below) |
+### Placeholders
 
+| Placeholder | Description | On Error |
+|-------------|-------------|----------|
+| `{{currentDate}}` | Current date | — |
+| `{{hostPlatform}}` | Platform info | — |
+| `{{pythonVer}}` | Python version | — |
+| `{{workspaceRoot}}` | Working directory | Empty |
+| `{{env}}` | Environment description | Empty |
+| `{{serverInstructions}}` | MCP server instructions (XML) | Empty |
+| `{{agentSkills}}` | Available skills (XML) | Empty |
+| `{{file:path}}` | File content (relative path) | Error |
+| `{{file_silent:path}}` | File content (relative path) | Empty |
+| `{{url:https://...}}` | URL content | Empty |
 
-#### Agents as Tools
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `agents` | list | [] | Child agents available as tools to this agent. |
-
-#### History Preload
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `messages` | string/list | - | Path(s) to history file(s) for preloading conversation turns. Use the `./messages/` subdirectory to avoid confusion with AgentCards. **NOTE** Argument is *relative* to the agent-cards directory |
-
-### Advanced
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `function_tools` | list | [] | Python functions as tools: `["module.py:function_name"]`. (See note below) |
-| `request_params` | dict | {} | Model request parameters (e.g., `{temperature: 0.7}`). Use defaults (DO NOT SPECIFY) unless the User requests specific settings.  |
-
-
-### Body
-
-The optional markdown body following the frontmatter defines the agent's system prompt. If not specifed, the default is used.
-
-## System Prompt
-
-The System Prompt supports the following placeholders:
-
-| Placeholder | Description | Behavior on Error |
-|-------------|-------------|-------------------|
-| `{{currentDate}}` | Current date (e.g., "17 December 2025") | N/A - always succeeds |
-| `{{hostPlatform}}` | Platform info (e.g., "Linux-6.6.0-x86_64") | N/A - always succeeds |
-| `{{pythonVer}}` | Python version (e.g., "3.12.0") | N/A - always succeeds |
-| `{{workspaceRoot}}` | Working directory path | Empty string if not set |
-| `{{env}}` | Environment description | Empty string if not set |
-| `{{serverInstructions}}` | MCP server instructions (XML) | Empty string if no servers/failure |
-| `{{agentSkills}}` | Available skills (XML) | Empty string if no skills |
-| `{{file:path}}` | Read file content (relative path) | Raises error if missing |
-| `{{file_silent:path}}` | Read file content (relative path) | Empty string if missing. This is useful for optional files like AGENTS.md |
-| `{{url:https://...}}` | Fetch content from URL | Empty string on failure |
-
-Notes
-
-- File paths in {{file:...}} must be relative (absolute paths raise an error)
-- {{file_silent:AGENTS.md}} is commonly used to include project-specific agent documentation
-- Unresolved placeholders are replaced with empty string (won't confuse the LLM)
+**Notes:**
+- File paths must be relative
+- `{{file_silent:AGENTS.md}}` is commonly used for project-specific docs
+- Unresolved placeholders become empty strings
 
 ### Default System Prompt
-
-If no System Prompt is supplied, the default is used: 
 
 ```markdown
 You are a helpful AI Agent.
@@ -135,35 +115,29 @@ You are a helpful AI Agent.
 The current date is {{currentDate}}.
 ```
 
-### Location
+### Loading External Prompts
 
-System Prompts can be supplied either by:
+Use `instruction: <path|url>` to load from a file or URL.
 
-- Placing the System Prompt content directly in the AgentCard.
-- Loaded from a file or URL using `instruction: <path|url>` 
+**TIP:** Use raw file URLs:
+- **GitHub:** `https://raw.githubusercontent.com/.../SKILL.md`
+- **Gist:** `https://gist.githubusercontent.com/.../raw/.../file.py`
+- **HuggingFace:** `https://huggingface.co/.../raw/main/README.md`
+- **Docs:** `https://modelcontextprotocol.io/docs/learn/architecture.md`
 
-**TIP** When including content from URLs, access files in their raw form or as markdown whenever possible e.g.:
- - GitHub: `https://raw.githubusercontent.com/kepano/obsidian-skills/refs/heads/main/json-canvas/SKILL.md`
- - Gist: `https://gist.githubusercontent.com/evalstate/e5d659bbde778c526531d1cd8bc3d933/raw/d9e52d0de9dcada4d7a0a8605944e52428345d3a/test.py`
- - Hugging Face: `https://huggingface.co/spaces/toad-hf-inference-explorers/README/raw/main/README.md`
- - General Documentation: `https://modelcontextprotocol.io/docs/learn/architecture.md `
-
-**TIP** Including content from URLs can simplify managing behaviour and rules across multiple deployed Agents (e.g. by placing rules or information in Gists or repositories).
+Centralizing prompts in URLs simplifies managing behavior across multiple agents.
 
 ## Preloading Message History
 
-Message History can be loaded from a markdown file:
+History files use this format:
 
-- If the first non‑empty line is not a delimiter, the whole file is treated as a single user message (simple mode).
-- Otherwise, messages are delimited by exact, case‑sensitive markers on their own line:
-    - ---USER
-    - ---ASSISTANT
-    - ---RESOURCE
+- **Simple mode:** If no delimiter on first non-empty line, entire file = one user message
+- **Delimited mode:** Use exact markers on their own line:
+  - `---USER`
+  - `---ASSISTANT`
+  - `---RESOURCE` (next line = relative path to embed)
 
-- ---RESOURCE attaches a file to the current user/assistant section; the next line must be a  resource path (relative to the history file). The loader reads the file and embeds it.
-
-Example:
-
+**Example:**
 ```
 ---USER
 Summarize the attached config.
@@ -172,123 +146,120 @@ Summarize the attached config.
 configs/app.yaml
 
 ---ASSISTANT
-Here’s a brief summary...
+Here's a brief summary...
 ```
 
-How to use it in an AgentCard:
-
-```
+**Usage:**
+```yaml
 ---
 name: my_agent
-messages: ./message/history.md
+messages: ./messages/history.md
 ---
-(Optional system prompt here)
 ```
 
 ## Agents as Tools
 
-Agents can be supplied as Tools to a parent Agent. 
+Child agents handle multi-turn tasks (e.g., search and summarization) within their own context, returning only results to the parent.
 
-For example, a "Search Agent" would be useful as a Tool as the search and summarization operations would be managed within the child agents context. The "Search Agent" may also use a faster, more efficient model and itself have tools or shell access to support it's function.
-
-To include an Agent as a Tool, place it in the "Agents" list using it's name:
-
-```
+```yaml
 agents:
-  - tool1
-  - tool2
+  - search_agent
+  - tool_agent
 ```
 
-Use this pattern where an Agent may conduct tasks that may take multiple turns (for example searching) and only the result is required in the parent agent context.
+Child agents can use faster/cheaper models and have their own tools or shell access.
+
+### Tool-only Agents
+
+For agents intended exclusively as tools, use `tool_only: true`:
+
+```yaml
+---
+name: code_formatter
+tool_only: true
+description: Formats code according to project style guidelines.
+---
 
 ## Design Considerations
 
 ### Model Selection
 
-By default, Agents will use the default model supplied by the harness, which is capable of the required tasks. There may be instances where a specific model is required or requested. That can be selected by including `model: <model_id>` in the frontmatter.
-
-For tasks that require speed `gpt-oss` is a good, relatively cheap choice, especially for search and "workhorse" style tool calling/data processing.
+Agents use the harness default model unless `model: <model_id>` is specified. For speed-critical tasks (search, data processing), `gpt-oss` is a cost-effective choice.
 
 ### Shell Access
 
-Agents can be given access to the shell with `shell: true` in the frontmatter. This adds an `execute` tool that allows the Agent to execute bash commands. Note in the Toad environment shell access will be present.
+Enable with `shell: true`. Adds an `execute` tool for bash commands. In Toad, shell access is present by default.
 
 ### Python Functions
 
-An alternative to direct shell access is to equip the Agent with Python functions. 
+Reference functions as `module.py:function_name`:
 
-You reference functions using the format module.py:function_name in the function_tools field:
-
+```yaml
 ---
 name: my_agent
 function_tools:
   - tools.py:add
   - hf_api_tool.py:hf_api_request
 ---
+```
 
-The path is resolved relative to the AgentCard's directory, so you can keep the function file next to your card.
+Paths resolve relative to the AgentCard directory.
 
-#### How It Works
+**How it works:**
+1. Loader parses the `module.py:function_name` spec
+2. Dynamically imports the module via `importlib.util`
+3. Wraps the function as a FastMCP tool
+4. Auto-generates JSON schema from type hints and docstrings
 
-1. When the card loads, the loader parses the module.py:function_name spec
-2. Uses importlib.util to dynamically load the Python module
-3. Extracts the named function and wraps it as a FastMCP tool
-4. The tool's JSON schema is auto-generated from type hints and docstring
+| Requirement | Detail |
+|-------------|--------|
+| Type hints | Required for schema generation |
+| Return type | Must be JSON-serializable |
+| Execution | Same Python process (no sandbox) |
+| Imports | Standard Python—any installed package works |
 
-| Aspect | Constraint |
-|--------|------------|
-| Type hints | Required on parameters for schema generation |
-| Return type | Should be JSON-serializable |
-| Execution | Runs in the same Python process (no sandboxing) |
-| Module syntax | Must be valid Python (errors fail fast) |
-| Callable check | Must be a callable (raises AgentConfigError if not) |
-
-#### How Dependencies Work
-
-Dependencies work via standard Python imports - your function module can import anything installed in the environment:
-
-```python 
-import json
+**Example:**
+```python
 import os
 from urllib.request import Request, urlopen
 
 def hf_api_request(endpoint: str, method: str = "GET") -> dict:
-    token = os.getenv("HF_TOKEN")  # Environment variables work
-    # ... use urllib, json, etc.
+    token = os.getenv("HF_TOKEN")
+    # ... implementation
 ```
 
-Key points:
-- All imports in your module are executed when loaded
-- External packages must be installed in the same environment as fast-agent
-- Environment variables are accessible via os.getenv()
-- Import failures raise AgentConfigError with clear messages
-
-Python functions can be faster, more robust and efficient at processing and transforming data.
+Python functions are often faster and more robust for data processing.
 
 ### History Management
 
-By default Agents retain their history, making them conversational. 
+| Agent Type | History Behavior |
+|------------|------------------|
+| Standard agents | Retained (conversational) |
+| Agents as tools | Not retained between invocations |
 
-Agents as Tools do not retain history between tool invocations. 
+Disable with `use_history: false` for:
+- Unbiased question-answering (no conversation skew)
+- Content transformation via few-shot prompting (consistent pattern application)
 
-To disable history retention for an agent, use `history: false` in the frontmatter. This is extremely useful for Agents that should act as "Responders". Particular use-cases for this are:
-- Agents that should answer questions without being skewed by previous conversation turns.
-- Agents configured with User/Assistant turns for in-context learning/few-shot prompting where the goal of the Agent is  content transformation to a particular pattern - for example would be adjusting prose or writing style.
+### History Management
 
-### Interaction with Agent Skills
+| Agent Type | History Behavior |
+|------------|------------------|
+| Standard agents | Retained (conversational) |
+| Agents as tools | Not retained between invocations |
 
-Agent Skills are markdown files named SKILL.md containing instructions and examples and so on that the Agent may read if to extend its capabilities.
+Disable with `use_history: false` for:
+- Unbiased question-answering (no conversation skew)
+- Content transformation via few-shot prompting (consistent pattern application)### Skills
 
-Disable skills for Agents that have a very specific focussed task with a narrow outcome.
+Skills are SKILL.md files that extend agent capabilities. Descriptions auto-load into the system prompt via `{{agentSkills}}`.
 
-Specify a skills directory to constrain available skills. For example in the AgentCard frontmatter: `skills: ./my-custom-skills/` and include a SKILLS.md file.  
+| Configuration | Effect |
+|---------------|--------|
+| Default | Auto-discover from `.fast-agent/skills/` |
+| `skills: ./custom-skills/` | Use specific directory |
+| `skills: []` | Disable skills |
 
-Skills descriptions are automatically loaded in to the System Prompt if {{agentSkills}} is present.
-
-#### Disabling Skills
-
-By default, if Agent Skills are present in the .fast-agent/skills directory, they are automatically loaded in to the System Prompt and shell access is enabled. If you DO NOT want the Agent to automatically use and discover skills, disable them in the AgentCard frontmatter: `skills: []`. 
-
-Skills may also be disabled by excluding {{agentSkills}} from the System Prompt, however this will generate a warning if skills were otherwise available.
-
+Disable skills for narrowly-focused agents. Excluding `{{agentSkills}}` from the prompt also works but generates a warning.
+```
 
