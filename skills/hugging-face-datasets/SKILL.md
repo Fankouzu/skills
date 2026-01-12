@@ -52,6 +52,12 @@ Supports diverse dataset types through template system:
 
 # Usage Instructions
 
+> **All paths are relative to the directory containing this SKILL.md
+file.**
+> Before running any script, first `cd` to that directory or use the full
+path.
+
+
 The skill includes two Python scripts:
 - `scripts/dataset_manager.py` - Dataset creation and management
 - `scripts/sql_manager.py` - SQL-based dataset querying and transformation

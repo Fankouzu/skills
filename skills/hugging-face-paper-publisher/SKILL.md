@@ -59,6 +59,12 @@ The skill includes Python scripts in `scripts/` for paper publishing operations.
 - Set `HF_TOKEN` environment variable with Write-access token
 - Activate virtual environment: `source .venv/bin/activate`
 
+> **All paths are relative to the directory containing this SKILL.md
+file.**
+> Before running any script, first `cd` to that directory or use the full
+path.
+
+
 ### Method 1: Index Paper from arXiv
 
 Add a paper to Hugging Face Paper Pages from arXiv.
